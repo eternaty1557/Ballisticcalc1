@@ -5,7 +5,6 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
-import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -21,25 +20,37 @@ class UserManager(private val context: Context) {
         private val USER_CURRENT_ROLE = stringPreferencesKey("user_current_role")
     }
 
+    /**
+     * Всегда возвращает UserProfile (никогда null).
+     * Если пользователь не залогинен — возвращается гостевой профиль.
+     */
     @RequiresApi(Build.VERSION_CODES.O)
-    val userFlow: Flow<UserProfile?> = context.userDataStore.data.map { prefs ->
-        if (prefs[USER_LOGGED_IN] == true) {
-            UserProfile(
-                callsign = prefs[USER_CALLSIGN] ?: "Unknown",
-                division = prefs[USER_DIVISION] ?: "00",
-                weaponType = enumValueOf(prefs[USER_CURRENT_ROLE] ?: "SNIPER_RIFLES")
-            )
+    val userFlow: Flow<UserProfile> = context.userDataStore.data.map { prefs ->
+        val isLoggedIn = prefs[USER_LOGGED_IN] ?: false
+        val callsign = prefs[USER_CALLSIGN] ?: "Guest"
+        val division = prefs[USER_DIVISION] ?: "00"
+
+        val roleString = prefs[USER_CURRENT_ROLE] ?: "SNIPER_RIFLES"
+        val weaponType = runCatching {
+            enumValueOf<WeaponType>(roleString)
+        }.getOrElse {
+            WeaponType.SNIPER_RIFLES // fallback
+        }
+
+        if (isLoggedIn) {
+            UserProfile(callsign = callsign, division = division, weaponType = weaponType)
         } else {
-            null
+            // Гостевой режим: можно использовать те же данные или дефолтные
+            UserProfile(callsign = "Guest", division = "00", weaponType = WeaponType.SNIPER_RIFLES)
         }
     }
 
     suspend fun login(callsign: String, division: String) {
         context.userDataStore.edit { prefs ->
             prefs[USER_LOGGED_IN] = true
-            prefs[USER_CALLSIGN] = callsign
-            prefs[USER_DIVISION] = division
-            prefs[USER_CURRENT_ROLE] = "SNIPER_RIFLES"
+            prefs[USER_CALLSIGN] = callsign.trim().ifEmpty { "Guest" }
+            prefs[USER_DIVISION] = division.trim().ifEmpty { "00" }
+            prefs[USER_CURRENT_ROLE] = WeaponType.SNIPER_RIFLES.name
         }
     }
 
@@ -52,9 +63,7 @@ class UserManager(private val context: Context) {
     suspend fun logout() {
         context.userDataStore.edit { prefs ->
             prefs[USER_LOGGED_IN] = false
-            prefs.remove(USER_CALLSIGN)
-            prefs.remove(USER_DIVISION)
-            prefs.remove(USER_CURRENT_ROLE)
+            // Опционально: можно очистить данные или оставить для быстрого входа
         }
     }
 }

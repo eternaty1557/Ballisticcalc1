@@ -1,71 +1,49 @@
 package com.example.ballisticcalc
 
-import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.*
-import androidx.datastore.preferences.preferencesDataStore
+import com.example.ballisticcalc.data.BallisticDao
+import com.example.ballisticcalc.data.WeaponProfileEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "weapon_profiles")
+class WeaponProfileManager(private val dao: BallisticDao) {
 
-class WeaponProfileManager(private val context: Context) {
+    fun getProfileIdsFlow(): Flow<Set<String>> {
+        return dao.getAllProfileIds().map { list ->
+            list.map { it.id }.toSet()
+        }
+    }
 
-    companion object {
-        private val PROFILE_LIST_KEY = stringSetPreferencesKey("profile_list")
+    fun getProfileFlow(id: String): Flow<WeaponProfile?> {
+        return dao.getProfilesByPrefix(id).map { list ->
+            list.firstOrNull { it.id == id }?.toDomain()
+        }
     }
 
     suspend fun saveProfile(profile: WeaponProfile) {
-        val profileKey = stringPreferencesKey("profile_${profile.id}")
-        context.dataStore.edit { prefs ->
-            prefs[profileKey] = profile.toString()
-            val currentList = prefs[PROFILE_LIST_KEY] ?: emptySet()
-            prefs[PROFILE_LIST_KEY] = currentList + profile.id
-        }
+        dao.insertProfile(profile.toEntity())
     }
-
-    fun getProfileFlow(id: String): Flow<WeaponProfile?> = context.dataStore.data
-        .map { prefs ->
-            val profileKey = stringPreferencesKey("profile_$id")
-            prefs[profileKey]?.let { profileStr ->
-                parseProfile(profileStr)
-            }
-        }
-
-    fun getProfileIdsFlow(): Flow<Set<String>> = context.dataStore.data
-        .map { prefs -> prefs[PROFILE_LIST_KEY] ?: emptySet() }
 
     suspend fun deleteProfile(id: String) {
-        context.dataStore.edit { prefs ->
-            val profileKey = stringPreferencesKey("profile_$id")
-            prefs.remove(profileKey)
-            val currentList = prefs[PROFILE_LIST_KEY] ?: emptySet()
-            prefs[PROFILE_LIST_KEY] = currentList - id
-        }
+        dao.deleteProfile(id)
     }
 
-    private fun parseProfile(profileStr: String): WeaponProfile? {
-        return try {
-            val regex = Regex(
-                """WeaponProfile\(id='([^']*)', weaponName='([^']*)', projectileName='([^']*)', sightType='([^']*)'(?:, zeroDistance=(\d+))?(?:, notes='([^']*)')?\)"""
-            )
-            val matchResult = regex.find(profileStr)
-            if (matchResult != null) {
-                val groups = matchResult.groupValues
-                WeaponProfile(
-                    id = groups[1],
-                    weaponName = groups[2],
-                    projectileName = groups[3],
-                    sightType = groups[4],
-                    zeroDistance = groups.getOrNull(5)?.toIntOrNull() ?: 100,
-                    notes = groups.getOrNull(6) ?: ""
-                )
-            } else {
-                null
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
+    suspend fun deleteProfilesByPrefix(prefix: String) {
+        dao.deleteProfilesByPrefix(prefix)
     }
+
+    private fun WeaponProfileEntity.toDomain() = WeaponProfile(
+        id = id,
+        weaponName = weaponName,
+        projectileName = projectileName,
+        sightType = sightType,
+        notes = notes
+    )
+
+    private fun WeaponProfile.toEntity() = WeaponProfileEntity(
+        id = id,
+        weaponName = weaponName,
+        projectileName = projectileName,
+        sightType = sightType,
+        notes = notes
+    )
 }
