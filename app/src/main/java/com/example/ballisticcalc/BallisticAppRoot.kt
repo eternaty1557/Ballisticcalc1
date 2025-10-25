@@ -15,7 +15,8 @@ import kotlinx.coroutines.launch
 @ExperimentalMaterial3Api
 fun BallisticAppRoot(
     profileManager: WeaponProfileManager,
-    userManager: UserManager
+    userManager: UserManager,
+    onLogout: Any
 )
 {
     val user = userManager.userFlow.collectAsState(initial = null).value

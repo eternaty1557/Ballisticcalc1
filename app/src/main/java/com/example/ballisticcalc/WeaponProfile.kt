@@ -1,13 +1,13 @@
 package com.example.ballisticcalc
 
-import androidx.compose.runtime.Immutable
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-@Immutable
+@Entity(tableName = "weapon_profiles")
 data class WeaponProfile(
-    val id: String = "",
-    val weaponName: String,
-    val projectileName: String,
-    val sightType: String,
-    val zeroDistance: Int = 100,
+    @PrimaryKey val id: String,
+    val weaponName: String = "",
+    val projectileName: String = "",
+    val sightType: String = "",
     val notes: String = ""
 )

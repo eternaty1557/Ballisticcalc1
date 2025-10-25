@@ -1,6 +1,11 @@
+import org.jetbrains.kotlin.gradle.internal.Kapt3GradleSubplugin.Companion.isKaptVerbose
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id ("org.jetbrains.kotlin.plugin.compose")
+    id ("org.jetbrains.kotlin.kapt")
+
 }
 
 android {
@@ -36,6 +41,7 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+
     buildFeatures {
         compose = true
     }
@@ -59,6 +65,18 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.ui)
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    // Room
+    dependencies {
+        implementation ("androidx.room:room-runtime:2.6.1")
+        implementation ("androidx.room:room-ktx:2.6.1")
+        kapt ("androidx.room:room-compiler:2.6.1")
+    }
+
+// Coroutines + Lifecycle
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
