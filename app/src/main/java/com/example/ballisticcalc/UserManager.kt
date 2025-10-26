@@ -21,12 +21,16 @@ class UserManager(private val context: Context) {
     }
 
     /**
-     * Всегда возвращает UserProfile (никогда null).
-     * Если пользователь не залогинен — возвращается гостевой профиль.
+     * Возвращает Flow с UserProfile, если пользователь залогинен.
+     * Если не залогинен — возвращает null.
      */
     @RequiresApi(Build.VERSION_CODES.O)
-    val userFlow: Flow<UserProfile> = context.userDataStore.data.map { prefs ->
+    val authenticatedUserFlow: Flow<UserProfile?> = context.userDataStore.data.map { prefs ->
         val isLoggedIn = prefs[USER_LOGGED_IN] ?: false
+        if (!isLoggedIn) {
+            return@map null
+        }
+
         val callsign = prefs[USER_CALLSIGN] ?: "Guest"
         val division = prefs[USER_DIVISION] ?: "00"
 
@@ -34,15 +38,18 @@ class UserManager(private val context: Context) {
         val weaponType = runCatching {
             enumValueOf<WeaponType>(roleString)
         }.getOrElse {
-            WeaponType.SNIPER_RIFLES // fallback
+            WeaponType.SNIPER_RIFLES
         }
 
-        if (isLoggedIn) {
-            UserProfile(callsign = callsign, division = division, weaponType = weaponType)
-        } else {
-            // Гостевой режим: можно использовать те же данные или дефолтные
-            UserProfile(callsign = "Guest", division = "00", weaponType = WeaponType.SNIPER_RIFLES)
-        }
+        UserProfile(callsign = callsign, division = division, weaponType = weaponType)
+    }
+
+    /**
+     * (Опционально) Всегда возвращает профиль — для использования внутри основного экрана.
+     */
+    @RequiresApi(Build.VERSION_CODES.O)
+    val userFlow: Flow<UserProfile> = authenticatedUserFlow.map { user ->
+        user ?: UserProfile(callsign = "Guest", division = "00", weaponType = WeaponType.SNIPER_RIFLES)
     }
 
     suspend fun login(callsign: String, division: String) {
@@ -63,7 +70,7 @@ class UserManager(private val context: Context) {
     suspend fun logout() {
         context.userDataStore.edit { prefs ->
             prefs[USER_LOGGED_IN] = false
-            // Опционально: можно очистить данные или оставить для быстрого входа
+            // Не очищаем данные — можно быстро залогиниться снова
         }
     }
 }
