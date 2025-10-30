@@ -336,9 +336,21 @@ fun BallisticCalculatorApp(
                         weaponName = weapon.name,
                         projectileName = projectile.name,
                         sightType = weapon.sightType.name,
+
+                        // Сохраняем все поля ввода
+                        angle = angle,
+                        targetDistance = targetDistance,
+                        temperature = temperature,
+                        windSpeed = windSpeed,
+                        windDirection = windDirection,
+                        pressure = pressure,
+
+                        // Сохраняем результат и траекторию
+                        resultText = resultText,
+                        trajectoryPoints = trajectoryPoints,
+
                         notes = "Сохранено ${LocalDateTime.now()}"
                     )
-
                     scope.launch {
                         profileManager.saveProfile(profile)
                         Toast.makeText(
@@ -389,65 +401,41 @@ fun BallisticCalculatorApp(
     }
 
     // Диалог — ВНЕ LazyColumn!
+
+
     if (showProfileManager) {
         AlertDialog(
             onDismissRequest = { showProfileManager = false },
             title = { Text(text = "Мои профили (${user.weaponType.name})") },
-            text = {
+            text = onProfileSelected@{
                 ProfileManagerScreen(
                     profileManager = profileManager,
                     currentRolePrefix = "${user.callsign}_${user.weaponType.name}_",
                     onProfileSelected = { selectedProfile: WeaponProfile ->
-                        val weaponIndex = weapons.indexOfFirst { it.name == selectedProfile.weaponName }
+                        // ✅ Используем исправленную логику выше
+                        val weaponIndex = filteredWeapons.indexOfFirst { it.name == selectedProfile.weaponName }
                         if (weaponIndex != -1) {
                             selectedWeaponIndex = weaponIndex
-                            val projectileIndex =
-                                weapons[weaponIndex].projectiles.indexOfFirst { it.name == selectedProfile.projectileName }
+                            val projectileIndex = filteredWeapons[weaponIndex].projectiles.indexOfFirst { it.name == selectedProfile.projectileName }
                             if (projectileIndex != -1) {
                                 selectedProjectileIndex = projectileIndex
                             }
-                            Toast.makeText(
-                                context,
-                                "✅ Загружен: ${selectedProfile.weaponName}",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Toast.makeText(context, "✅ Загружен: ${selectedProfile.weaponName}", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "⚠️ Оружие '${selectedProfile.weaponName}' недоступно в текущей роли", Toast.LENGTH_LONG).show()
+                            return@ProfileManagerScreen
                         }
-                        showProfileManager = false
-                    },
-                    onDismiss = { showProfileManager = false },
-                    context = context,
-                    scope = scope
-                )
-            },
-            confirmButton = {}
-        )
-    }
 
+                        // Восстановление полей
+                        angle = selectedProfile.angle
+                        targetDistance = selectedProfile.targetDistance
+                        temperature = selectedProfile.temperature
+                        windSpeed = selectedProfile.windSpeed
+                        windDirection = selectedProfile.windDirection
+                        pressure = selectedProfile.pressure
+                        resultText = selectedProfile.resultText
+                        trajectoryPoints = selectedProfile.trajectoryPoints
 
-    if (showProfileManager) {
-        AlertDialog(
-            onDismissRequest = { showProfileManager = false },
-            title = { Text(text = "Мои профили (${user.weaponType.name})") },
-            text = {
-                ProfileManagerScreen(
-                    profileManager = profileManager,
-                    currentRolePrefix = "${user.callsign}_${user.weaponType.name}_",
-                    onProfileSelected = { selectedProfile: WeaponProfile -> // ✅ Явно указали тип!
-                        val weaponIndex =
-                            weapons.indexOfFirst { it.name == selectedProfile.weaponName }
-                        if (weaponIndex != -1) {
-                            selectedWeaponIndex = weaponIndex
-                            val projectileIndex =
-                                weapons[weaponIndex].projectiles.indexOfFirst { it.name == selectedProfile.projectileName }
-                            if (projectileIndex != -1) {
-                                selectedProjectileIndex = projectileIndex
-                            }
-                            Toast.makeText(
-                                context,
-                                "✅ Загружен: ${selectedProfile.weaponName}",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
                         showProfileManager = false
                     },
                     onDismiss = { showProfileManager = false },
@@ -562,6 +550,8 @@ fun WeaponSelector(
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(focusRequester) // ✅ Передача focusRequester
+                .clickable { expanded = true }, // ← КЛЮЧЕВОЕ ИЗМЕНЕНИЕ!
+
         )
 
         ExposedDropdownMenu(
@@ -602,6 +592,7 @@ fun ProjectileSelector(
             label = { Text("Выберите снаряд") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier.fillMaxWidth()
+                .clickable { expanded = true }, // ← КЛЮЧЕВОЕ ИЗМЕНЕНИЕ!
         )
 
         ExposedDropdownMenu(

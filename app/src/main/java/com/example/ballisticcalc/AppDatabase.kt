@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 
 @Database(
     entities = [WeaponProfile::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -23,7 +23,10 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "ballisticcalc_database"
-                ).build().also { INSTANCE = it }
+                )
+                    .fallbackToDestructiveMigration() // ← УДАЛЯЕТ СТАРУЮ БД при изменении схемы
+                    .build()
+
             }
         }
     }
