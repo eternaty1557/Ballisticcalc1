@@ -32,11 +32,11 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    // Получаем пользователя
+
                     val user by userManager.authenticatedUserFlow.collectAsStateWithLifecycle(initialValue = null)
 
                     if (user == null) {
-                        // Показываем экран входа
+
                         LoginScreen(
                             onLogin = { callsign, division ->
                                 lifecycleScope.launch {
@@ -45,7 +45,7 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     } else {
-                        // Показываем основное приложение
+
                         BallisticAppRoot(
                             profileManager = profileManager,
                             userManager = userManager,

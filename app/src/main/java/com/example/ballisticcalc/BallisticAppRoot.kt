@@ -16,8 +16,8 @@ import kotlinx.coroutines.launch
 fun BallisticAppRoot(
     profileManager: WeaponProfileManager,
     userManager: UserManager,
-    onLogout: Any,
-    user: Any
+    user: UserProfile,
+    onLogout: () -> Unit
 )
 {
     val user = userManager.userFlow.collectAsState(initial = null).value

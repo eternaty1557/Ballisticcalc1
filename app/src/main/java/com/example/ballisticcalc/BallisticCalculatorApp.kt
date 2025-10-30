@@ -277,6 +277,14 @@ fun BallisticCalculatorApp(
                                 horizontalAdjustmentText =
                                     if (horThousandths > 0) "Вправо: ${"%.1f".format(horThousandths)} тыс." else "Влево: ${"%.1f".format(-horThousandths)} тыс."
                             }
+                            else -> {
+                                // По умолчанию — просто показываем числа
+                                verticalAdjustmentText = "Вертикальная поправка: ${verticalCorrectionM} м"
+                                horizontalAdjustmentText = "Горизонтальная поправка: ${horizontalCorrectionM} м"
+                            }
+
+
+
                         }
 
                         resultText = """

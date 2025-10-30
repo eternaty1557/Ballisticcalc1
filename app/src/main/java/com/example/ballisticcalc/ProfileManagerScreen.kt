@@ -18,7 +18,8 @@ fun ProfileManagerScreen(
     profileManager: WeaponProfileManager,
     currentRolePrefix: String,
     onProfileSelected: (WeaponProfile) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+
 ) {
     val profileIds by profileManager.getProfileIdsFlow().collectAsState(initial = emptySet())
     val profiles = profileIds

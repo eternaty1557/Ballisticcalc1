@@ -2,9 +2,11 @@ package com.example.ballisticcalc
 
 enum class WeaponType {
     SNIPER_RIFLES,
-    MORTARS,
     ASSAULT_RIFLES,
-    MACHINE_GUNS
+    MACHINE_GUNS,  // ← добавлено!
+    MORTARS,
+    ARTILLERY,
+    RSZO
 }
 
 data class UserProfile(
