@@ -299,12 +299,12 @@ fun BallisticCalculatorApp(
                         }
 
                         // ✅ ШАГ 2: Безопасно парсим значения (с trim!)
-                        val angleVal = angle.trim().toDouble()
-                        val targetDistVal = targetDistance.trim().toDouble()
-                        val tempVal = temperature.trim().toDouble()
-                        val windSpeedVal = windSpeed.trim().toDouble()
-                        val windDirVal = windDirection.trim().toDouble()
-                        val pressureVal = pressure.trim().toDouble()
+                        val angleVal = angle.trim().replace(',', '.').toDoubleOrNull() ?: 0.0
+                        val targetDistVal = targetDistance.trim().replace(',', '.').toDoubleOrNull() ?: 0.0
+                        val windSpeedVal = windSpeed.trim().replace(',', '.').toDoubleOrNull() ?: 0.0
+                        val windDirVal = windDirection.trim().replace(',', '.').toDoubleOrNull() ?: 0.0
+                        val pressureVal = pressure.trim().replace(',', '.').toDoubleOrNull() ?: 0.0
+                        val tempVal = temperature.trim().replace(',', '.').toDoubleOrNull() ?: 0.0
 
                         // Теперь используем эти переменные вместо angle.toDouble() и т.д.
                         val projectile = filteredWeapons[selectedWeaponIndex].projectiles[selectedProjectileIndex]
