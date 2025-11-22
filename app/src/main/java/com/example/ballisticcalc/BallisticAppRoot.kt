@@ -125,18 +125,18 @@ private fun MainScreenContent(
                 Text(
                     text = "Добро пожаловать",
                     style = MaterialTheme.typography.labelMedium,
-                    color = Color(0xFF66BB6A) // светло-зелёный
+                    color = Color(0xFF4115DC) // светло-зелёный
                 )
                 Text(
                     text = user.callsign,
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = Color(0xFF4115DC)
                 )
                 Text(
                     text = "Подразделение: ${user.division}",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.LightGray
+                    color = Color(0xFF4115DC)
                 )
             }
         }

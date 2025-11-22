@@ -15,7 +15,7 @@ import androidx.core.view.WindowCompat
 
 private val LightColorScheme = lightColorScheme(
     primary = Color(0xFF4CAF50),      // тактический зелёный
-    background = Color(0xFFF5F5F5),    // светло-серый фон (не белый — чтобы не слепить)
+    background = Color(0xFFEEC79E),    // светло-серый фон (не белый — чтобы не слепить)
     surface = Color(0xFFEEEEEE),       // чуть светлее фона — для карточек
     onBackground = Color(0xFF263238),  // тёмно-серый — отлично читается на светлом фоне
     onSurface = Color(0xFF1B263B)      // почти чёрный — для заголовков
