@@ -20,6 +20,7 @@ composeMaterial = "1.5.2"
 uiDesktop = "1.7.0"
 constraintlayoutVersion = "2.2.1"
 ui = "1.9.2"
+runtimeVersion = "1.9.5"
 
 [libraries]
 androidx-compose-material3-v120 = { module = "androidx.compose.material3:material3", version.ref = "material3Version" }
@@ -41,6 +42,7 @@ androidx-compose-material = { group = "androidx.wear.compose", name = "compose-m
 androidx-compose-ui-desktop = { group = "androidx.compose.ui", name = "ui-desktop", version.ref = "uiDesktop" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayoutVersion" }
 androidx-compose-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "ui" }
+androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtimeVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -5,6 +5,7 @@ import java.lang.Math.toRadians
 import kotlin.math.*
 import kotlin.math.pow
 
+
 fun calculateTrajectoryWithDrag(
     projectile: Projectile,
     angleDegrees: Double,

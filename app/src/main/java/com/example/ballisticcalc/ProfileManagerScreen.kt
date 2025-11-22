@@ -16,18 +16,19 @@ import kotlinx.coroutines.launch
 @Composable
 fun ProfileManagerScreen(
     profileManager: WeaponProfileManager,
-    currentRolePrefix: String,
-    onProfileSelected: (WeaponProfile) -> Unit,
-    onDismiss: () -> Unit,
-
+    currentRolePrefix: String = "",
+    onProfileSelected: (WeaponProfile) -> Unit,// ← ЕДИНСТВЕННЫЙ НОВЫЙ ПАРАМЕТР
+    onDismiss: () -> Unit = {}
 ) {
     val profileIds by profileManager.getProfileIdsFlow().collectAsState(initial = emptySet())
-    val profiles = profileIds
+
+    // ✅ Безопасный сбор профилей (без вложенного collectAsState)
+    val profiles: List<WeaponProfile> = profileIds
         .filter { it.startsWith(currentRolePrefix) }
-        .mapNotNull { id ->
-            val profileFlow = profileManager.getProfileFlow(id)
-            val profile by profileFlow.collectAsState(initial = null)
-            profile
+        .map { id ->
+            profileManager.getProfileFlow(id)
+        }.mapNotNull { flow ->
+            flow.collectAsState(initial = null).value
         }
 
     LazyColumn(
@@ -58,8 +59,7 @@ fun ProfileManagerScreen(
                         .fillMaxWidth()
                         .padding(vertical = 4.dp)
                         .clickable {
-                            onProfileSelected(profile)
-                            onDismiss()
+                            onProfileSelected(profile) // ✅ передаём профиль
                         },
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {

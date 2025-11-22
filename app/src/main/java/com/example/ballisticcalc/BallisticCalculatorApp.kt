@@ -76,10 +76,14 @@ fun BallisticCalculatorApp(
     userManager: UserManager,
     user: UserProfile,
     onLogout: () -> Unit,
+    selectedProfile: WeaponProfile? = null,
+    initialProfile: WeaponProfile? = null
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
+    var weaponName by remember { mutableStateOf(initialProfile?.weaponName ?: "") }
+    var projectileName by remember { mutableStateOf(initialProfile?.projectileName ?: "") }
 
     var selectedWeaponIndex by remember { mutableIntStateOf(0) }
     var selectedProjectileIndex by remember { mutableIntStateOf(0) }
@@ -397,12 +401,7 @@ fun BallisticCalculatorApp(
                         }
 
                         resultText = """
-                    🎯 РАСЧЁТ ПО 4 ФОРМУЛАМ + ТРАЕКТОРИЯ:
-
-                    📐 ФОРМУЛА 1 (макс. высота, идеал): ${"%.2f".format(maxH)} м
-                    ⏱️ ФОРМУЛА 2 (время полёта, идеал): ${"%.2f".format(flightTime)} с
-                    📏 ФОРМУЛА 3 (дальность, идеал): ${"%.2f".format(range)} м
-                    🌀 ФОРМУЛА 4 (сила сопротивления): ${"%.3f".format(fd)} Н (ρ=${"%.4f".format(rho)} кг/м³)
+                    🎯 РАСЧЁТ:
 
                     🔥 РЕАЛИСТИЧНАЯ ТРАЕКТОРИЯ:
                     → Макс. высота: ${"%.2f".format(actualMaxHeight)} м

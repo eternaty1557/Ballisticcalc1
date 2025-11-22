@@ -78,6 +78,7 @@ dependencies {
 // Coroutines + Lifecycle
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation(libs.androidx.compose.runtime)
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
@@ -99,4 +100,14 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
+
+        // Location
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+
+        // Preferences (DataStore)
+    implementation("androidx.datastore:datastore-preferences:1.2.0")
+
+        // Sunrise/Sunset calculator (lightweight, no network)
+    implementation("joda-time:joda-time:2.12.7")
+  
 }
